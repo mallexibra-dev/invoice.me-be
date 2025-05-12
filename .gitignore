@@ -1,3 +1,5 @@
+src/generated
+
 # dependencies (bun install)
 node_modules
 
