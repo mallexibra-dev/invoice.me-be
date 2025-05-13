@@ -2,15 +2,15 @@
   Warnings:
 
   - You are about to alter the column `phone` on the `Companies` table. The data in that column could be lost. The data in that column will be cast from `Text` to `VarChar(15)`.
-  - A unique constraint covering the columns `[email]` on the table `User` will be added. If there are existing duplicate values, this will fail.
+  - You are about to drop the column `company_id` on the `Subscriptions` table. All the data in the column will be lost.
+  - A unique constraint covering the columns `[subscription_id]` on the table `Companies` will be added. If there are existing duplicate values, this will fail.
+  - Added the required column `subscription_id` to the `Companies` table without a default value. This is not possible if the table is not empty.
   - Added the required column `account_name` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `account_number` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `is_default` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `name` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `type` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `company_id` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `email` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `password` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `role` to the `User` table without a default value. This is not possible if the table is not empty.
 
 */
@@ -29,8 +29,15 @@ CREATE TYPE "ReminderChannel" AS ENUM ('whatsapp', 'email');
 -- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('unpaid', 'paid', 'overdue');
 
+-- DropForeignKey
+ALTER TABLE "Subscriptions" DROP CONSTRAINT "Subscriptions_company_id_fkey";
+
+-- DropIndex
+DROP INDEX "Subscriptions_company_id_key";
+
 -- AlterTable
-ALTER TABLE "Companies" ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15);
+ALTER TABLE "Companies" ADD COLUMN     "subscription_id" TEXT NOT NULL,
+ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15);
 
 -- AlterTable
 ALTER TABLE "Payment" ADD COLUMN     "account_name" TEXT NOT NULL,
@@ -40,12 +47,11 @@ ADD COLUMN     "name" TEXT NOT NULL,
 ADD COLUMN     "type" "PaymentType" NOT NULL;
 
 -- AlterTable
-ALTER TABLE "Subscriptions" ALTER COLUMN "start_date" SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "Subscriptions" DROP COLUMN "company_id",
+ALTER COLUMN "start_date" SET DEFAULT CURRENT_TIMESTAMP;
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "company_id" TEXT NOT NULL,
-ADD COLUMN     "email" TEXT NOT NULL,
-ADD COLUMN     "password" TEXT NOT NULL,
 ADD COLUMN     "role" "UserRole" NOT NULL;
 
 -- CreateTable
@@ -133,7 +139,10 @@ CREATE TABLE "Invoices" (
 CREATE UNIQUE INDEX "Clients_email_key" ON "Clients"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "Companies_subscription_id_key" ON "Companies"("subscription_id");
+
+-- AddForeignKey
+ALTER TABLE "Companies" ADD CONSTRAINT "Companies_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "Subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

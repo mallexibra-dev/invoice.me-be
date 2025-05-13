@@ -1,5 +1,5 @@
 import express from "express"
-import { loginUser, logoutUser } from "../controllers/authController";
+import { loginUser, logoutUser, validateToken } from "../controllers/authController";
 
 const router = express.Router();
 
@@ -13,14 +13,42 @@ const router = express.Router();
 /**
  * @swagger
  * /login:
- *   get:
+ *   post:
  *     tags: [Auth]
  *     summary: Login user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: mallexibra@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: admin-123
  *     responses:
  *       200:
  *         description: A list of users
  */
 router.post('/login', loginUser);
+
+/**
+ * @swagger
+ * /validate-token:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Get data user
+ *     responses:
+ *       200:
+ *         description: A list of users
+ */
+router.get('/validate-token', validateToken);
 
 /**
  * @swagger

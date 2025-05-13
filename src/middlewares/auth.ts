@@ -1,5 +1,5 @@
 import supabase from "../config/supabaseClient";
-import { errorResponse, successResponse } from "../utils/response";
+import { errorResponse } from "../utils/response";
 
 const authMiddleware = async (req: any, res: any, next: any) => {
     const token = req.headers.authorization?.replace('Bearer ', '');

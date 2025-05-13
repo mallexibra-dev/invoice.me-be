@@ -23,8 +23,9 @@ model Companies {
   logo         String
   brand_color  String
   payments     Payment[]
-  subscription Subscriptions?
   users        User[]
+  subscription_id String    @unique
+  subscription  Subscriptions @relation(fields: [subscription_id], references: [id])
 
   Clients   Clients[]
   Tasks     Tasks[]
@@ -42,9 +43,7 @@ model Subscriptions {
 
   plan_id String
   plan    SubscriptionPLan @relation(fields: [plan_id], references: [id])
-
-  company_id String    @unique
-  companies  Companies @relation(fields: [company_id], references: [id])
+  company Companies?
 }
 
 model SubscriptionPLan {
@@ -82,8 +81,6 @@ enum PaymentType {
 model User {
   id         String   @id @default(uuid())
   company_id String
-  email      String   @unique
-  password   String
   role       UserRole
 
   company Companies @relation(fields: [company_id], references: [id])

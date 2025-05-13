@@ -3,7 +3,7 @@ import prisma from '../../src/config/prismaClient';
 export async function seedInvoices() {
   const company = await prisma.companies.findFirst({ where: { name: 'PT Teknologi Hebat' } });
   const client = await prisma.clients.findFirst({ where: { name: 'Client A' } });
-  const user = await prisma.user.findFirst({ where: { email: 'admin@teknologihebat.com' } });
+  const user = await prisma.user.findFirst({ where: { role: 'owner' } });
   const template = await prisma.templates.findFirst({ where: { name: 'Invoice Template' } });
 
   if (company && client && user && template) {

@@ -1,0 +1,166 @@
+import express from "express";
+import multer from "multer";
+import {
+  createCompany,
+  deleteCompany,
+  getMyCompany,
+  updateCompany,
+} from "../controllers/companyController";
+
+const router = express.Router();
+const upload = multer();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Company
+ *   description: Management data company
+ */
+
+/**
+ * @swagger
+ * /companies:
+ *   post:
+ *     tags: [Company]
+ *     summary: Create a new company
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - address
+ *               - phone
+ *               - brand_color
+ *               - subscription
+ *               - logo
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: PT Contoh Sejahtera
+ *               email:
+ *                 type: string
+ *                 example: example@company.com
+ *               address:
+ *                 type: string
+ *                 example: Jl. Mawar No. 123
+ *               phone:
+ *                 type: string
+ *                 example: 081234567890
+ *               brand_color:
+ *                 type: string
+ *                 example: "#FF0000"
+ *               subscription:
+ *                 type: string
+ *                 example: 73298aeb-d417-48cd-8937-5f9a06ccf4b6
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Company created successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/", upload.single("logo"), createCompany);
+
+/**
+ * @swagger
+ * /companies/my:
+ *   get:
+ *     tags: [Company]
+ *     summary: Get company by ID
+ *     parameters:
+ *       - in: query
+ *         name: company_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the company
+ *     responses:
+ *       200:
+ *         description: Company data fetched successfully
+ *       400:
+ *         description: Invalid or missing company_id
+ *       404:
+ *         description: Company not found
+ *       500:
+ *         description: Server error
+ */
+
+router.get("/my", getMyCompany);
+
+/**
+ * @swagger
+ * /companies/{company_id}:
+ *   put:
+ *     tags: [Company]
+ *     summary: Update company
+ *     parameters:
+ *       - in: path
+ *         name: company_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the company to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               brand_color:
+ *                 type: string
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Company updated successfully
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Company not found
+ *       500:
+ *         description: Server error
+ */
+
+router.put("/:company_id", upload.single("logo"), updateCompany);
+
+/**
+ * @swagger
+ * /companies/{company_id}:
+ *   delete:
+ *     tags: [Company]
+ *     summary: Delete company
+ *     parameters:
+ *       - in: path
+ *         name: company_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the company to delete
+ *     responses:
+ *       200:
+ *         description: Company deleted successfully
+ *       404:
+ *         description: Company not found
+ *       500:
+ *         description: Server error
+ */
+
+router.delete("/:company_id", deleteCompany);
+
+export default router;
