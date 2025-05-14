@@ -14,6 +14,7 @@ export async function seedUsers() {
       data: {
         id: data.user?.id,
         role: 'owner',
+        name: "Maulana Malik Ibrahim",
         company_id: company.id,
       },
     });

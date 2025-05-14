@@ -13,7 +13,6 @@ export async function seedCompanies() {
           email: "admin@teknologihebat.com",
           address: "Jl. Inovasi No. 88, Jakarta",
           phone: "081234567890",
-          logo: "/logos/teknologihebat.png",
           brand_color: "#1D4ED8",
           subscription_id: subscription.id,
         },

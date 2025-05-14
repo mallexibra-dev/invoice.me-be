@@ -1,56 +1,52 @@
 import express from "express";
-import { createData, getAllData } from "../controllers/userController";
+import { getAllData, registerUser } from "../controllers/userController";
 
 const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Users
- *   description: User management endpoints
+ *   name: User
+ *   description: UManagement Users
  */
 
 /**
  * @swagger
- * /users:
- *   get:
- *     tags: [Users]
- *     summary: Get all users
- *     security:
- *      - bearerAuth: []
- *     responses:
- *       200:
- *         description: A list of users
- */
-router.get("/", getAllData);
-
-/**
- * @swagger
- * /users:
+ * /register:
  *   post:
- *     tags: [Users]
- *     summary: Create data user
- *     security:
- *      - bearerAuth: []
+ *     tags: [User]
+ *     summary: Register new user
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
  *               - name
- *               - file
+ *               - role
+ *               - company_id
+ *               - email
+ *               - password
  *             properties:
  *               name:
  *                 type: string
- *                 example: "John Doe"
- *               file:
+ *                 example: malik
+ *               role:
  *                 type: string
- *                 format: binary
+ *                 example: admin
+ *               company_id:
+ *                 type: string
+ *                 example: comp-1
+ *               email:
+ *                 type: string
+ *                 example: malikganteng@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: admin-123
  *     responses:
  *       200:
- *         description: A list of users
+ *         description: A list of user
  */
-router.post("/", createData);
+router.post('/register', registerUser);
 
 export default router;

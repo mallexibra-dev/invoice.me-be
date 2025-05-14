@@ -75,7 +75,7 @@ router.post("/", upload.single("logo"), createCompany);
  *     summary: Get company by ID
  *     parameters:
  *       - in: query
- *         name: company_id
+ *         name: user_id
  *         schema:
  *           type: string
  *         required: true
@@ -84,7 +84,7 @@ router.post("/", upload.single("logo"), createCompany);
  *       200:
  *         description: Company data fetched successfully
  *       400:
- *         description: Invalid or missing company_id
+ *         description: Invalid or missing user_id
  *       404:
  *         description: Company not found
  *       500:

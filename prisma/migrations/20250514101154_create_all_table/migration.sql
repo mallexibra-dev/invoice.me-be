@@ -11,6 +11,7 @@
   - Added the required column `name` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `type` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `company_id` to the `User` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `name` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `role` to the `User` table without a default value. This is not possible if the table is not empty.
 
 */
@@ -37,7 +38,8 @@ DROP INDEX "Subscriptions_company_id_key";
 
 -- AlterTable
 ALTER TABLE "Companies" ADD COLUMN     "subscription_id" TEXT NOT NULL,
-ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15);
+ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15),
+ALTER COLUMN "logo" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Payment" ADD COLUMN     "account_name" TEXT NOT NULL,
@@ -52,6 +54,8 @@ ALTER COLUMN "start_date" SET DEFAULT CURRENT_TIMESTAMP;
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "company_id" TEXT NOT NULL,
+ADD COLUMN     "name" TEXT NOT NULL,
+ADD COLUMN     "profile_image" TEXT,
 ADD COLUMN     "role" "UserRole" NOT NULL;
 
 -- CreateTable
