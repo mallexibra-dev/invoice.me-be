@@ -6,6 +6,8 @@ import {
   getMyCompany,
   updateCompany,
 } from "../controllers/companyController";
+import { validateData } from "../middlewares/validationData";
+import { companySchema } from "../schema/company";
 
 const router = express.Router();
 const upload = multer();
@@ -46,7 +48,7 @@ router.get("/my", getMyCompany);
 /**
  * @swagger
  * /companies/{company_id}:
- *   put:
+ *   patch:
  *     tags: [Company]
  *     summary: Update company
  *     parameters:
@@ -76,6 +78,8 @@ router.get("/my", getMyCompany);
  *               logo:
  *                 type: string
  *                 format: binary
+ *               subscription_id:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Company updated successfully
@@ -87,7 +91,7 @@ router.get("/my", getMyCompany);
  *         description: Server error
  */
 
-router.put("/:company_id", upload.single("logo"), updateCompany);
+router.patch("/:company_id", upload.single("logo"), validateData(companySchema.partial()), updateCompany);
 
 /**
  * @swagger

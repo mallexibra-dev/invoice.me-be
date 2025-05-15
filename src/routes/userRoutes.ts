@@ -1,6 +1,8 @@
 import express from "express";
 import { deleteUser, getAllData, registerUser, updateUser } from "../controllers/userController";
 import multer from "multer";
+import { validateData } from "../middlewares/validationData";
+import { userSchema } from "../schema/users";
 
 const router = express.Router();
 const upload = multer();
@@ -50,12 +52,12 @@ const upload = multer();
  *       200:
  *         description: A list of user
  */
-router.post('/register', registerUser);
+router.post('/register', validateData(userSchema), registerUser);
 
 /**
  * @swagger
  * /users/{user_id}:
- *   put:
+ *   patch:
  *     tags: [User]
  *     summary: Update user by id
  *     parameters:
@@ -88,7 +90,7 @@ router.post('/register', registerUser);
  *         description: Internal server error
  */
 
-router.put('/:user_id', upload.single('profile_image'), updateUser);
+router.patch('/:user_id', upload.single('profile_image'), validateData(userSchema.omit({role: true, company_id: true}).partial()), updateUser);
 
 /**
  * @swagger

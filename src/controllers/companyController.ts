@@ -84,7 +84,7 @@ export const deleteCompany = async (req: any, res: any) => {
 
     return successResponse(res, 200, "Delete company successfully");
   } catch (error: any) {
-    console.log(error.message);
+    logger.error(error.message);
     return errorResponse(res, 500, "Something wrong.");
   }
 };
