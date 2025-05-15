@@ -8,12 +8,7 @@ export const createCompany = async (req: any, res: any) => {
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
     const data = req.body;
-
     const file = req.file;
-
-    if (!file) {
-      return errorResponse(res, 400, "Logo file is required.");
-    }
 
     const result = await createCompanyService(token, file, data);
 

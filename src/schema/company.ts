@@ -7,7 +7,7 @@ const userSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-const companySchema = z.object({
+export const companySchema = z.object({
   name: z.string().min(1, "Company name is required"),
   address: z.string().min(1, "Address is required"),
   phone: z.string().min(12, "Phone must be at least 12 digits"),

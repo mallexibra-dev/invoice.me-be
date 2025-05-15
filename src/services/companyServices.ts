@@ -10,7 +10,8 @@ export const createCompanyService = async (
   dataUser: any
 ): Promise<ServiceResponse> => {
   try {
-    const { name, email, address, phone, brand_color, subscription } = dataUser;
+    const { name, email, address, phone, brand_color, subscription_id } =
+      dataUser;
     const { data } = await supabase.auth.getUser(token);
     const user = await prisma.user.findFirst({ where: { id: data.user?.id } });
 
@@ -21,16 +22,21 @@ export const createCompanyService = async (
         message: "You already have a company.",
       };
 
-    const fileName = `logos/${Date.now()}-${file.originalname}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("companies")
-      .upload(fileName, file.buffer, {
-        contentType: file.mimetype,
-      });
+    let logo = null;
+    if (file != null) {
+      const fileName = `logos/${Date.now()}-${file.originalname}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("companies")
+        .upload(fileName, file.buffer, {
+          contentType: file.mimetype,
+        });
 
-    if (uploadError) {
-      logger.error(`${uploadError.message}`);
-      return { error: true, status: 500, message: uploadError.message };
+      if (uploadError) {
+        logger.error(`${uploadError.message}`);
+        return { error: true, status: 500, message: uploadError.message };
+      }
+
+      logo = uploadData.path;
     }
 
     const company = await prisma.companies.create({
@@ -40,8 +46,8 @@ export const createCompanyService = async (
         address,
         phone,
         brand_color,
-        subscription_id: subscription,
-        logo: uploadData.path,
+        subscription_id,
+        logo,
       },
     });
 

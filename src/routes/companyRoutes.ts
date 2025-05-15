@@ -19,56 +19,6 @@ const upload = multer();
 
 /**
  * @swagger
- * /companies:
- *   post:
- *     tags: [Company]
- *     summary: Create a new company
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - address
- *               - phone
- *               - brand_color
- *               - subscription
- *               - logo
- *             properties:
- *               name:
- *                 type: string
- *                 example: PT Contoh Sejahtera
- *               email:
- *                 type: string
- *                 example: example@company.com
- *               address:
- *                 type: string
- *                 example: Jl. Mawar No. 123
- *               phone:
- *                 type: string
- *                 example: 081234567890
- *               brand_color:
- *                 type: string
- *                 example: "#FF0000"
- *               subscription:
- *                 type: string
- *                 example: 73298aeb-d417-48cd-8937-5f9a06ccf4b6
- *               logo:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Company created successfully
- *       500:
- *         description: Internal server error
- */
-router.post("/", upload.single("logo"), createCompany);
-
-/**
- * @swagger
  * /companies/my:
  *   get:
  *     tags: [Company]
