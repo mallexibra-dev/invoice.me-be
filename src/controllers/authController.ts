@@ -20,10 +20,11 @@ export const loginUser = async (req: any, res: any) => {
         error?.message || "Email or Password is wrong."
       );
 
-      const user = await prisma.user.findFirst({where: {id: data.user.id}});
+    const user = await prisma.user.findFirst({ where: { id: data.user.id } });
 
     return successResponse(res, 200, "Login successfully!", {
-      ...user, email: data.user.email,
+      ...user,
+      email: data.user.email,
       access_token: data.session.access_token,
     });
   } catch (error: any) {

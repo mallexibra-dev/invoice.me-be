@@ -32,7 +32,7 @@ const router = express.Router();
  *                 example: mallexibra@gmail.com
  *               password:
  *                 type: string
- *                 example: admin-123
+ *                 example: malik-ganteng
  *     responses:
  *       200:
  *         description: A list of users

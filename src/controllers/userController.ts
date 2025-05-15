@@ -1,4 +1,4 @@
-import { createUserService, createUserWithCompanyService, getAllUserCompanyService } from "../services/userServices";
+import { createUserService, createUserWithCompanyService, deleteUserService, getAllUserCompanyService, updateUserService } from "../services/userServices";
 import { errorResponse, successResponse } from "../utils/response";
 
 export const registerUser = async (req: any, res: any)=>{
@@ -33,9 +33,39 @@ export const getAllData = async (req: any, res: any)=> {
     try {
         if(company_id == null || typeof company_id !== "string") return errorResponse(res, 404, "Not valid company");
 
-        const users = await getAllUserCompanyService(company_id)
+        const result = await getAllUserCompanyService(company_id);
 
-        return successResponse(res, 200, "Success get data users", users);
+        if(result.error) return errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Success get data users", result.data);
+    } catch (error: any) {
+        return errorResponse(res, 500, error.message);
+    }
+}
+
+export const updateUser = async (req: any, res: any) => {
+    const {user_id} = req.params;
+    const data = req.body;
+    const profile_image = req.file;
+    try {
+        const result = await updateUserService(user_id, data, profile_image);
+
+        if(result.error) return errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Success update user by id", result.data);
+    } catch (error: any) {
+        return errorResponse(res, 500, error.message);
+    }
+}
+
+export const deleteUser = async (req: any, res: any) => {
+    const {user_id} = req.params;
+    try {
+        const result = await deleteUserService(user_id);
+
+        if(result.error) return errorResponse(res, result.status, result.message!)
+
+        return successResponse(res, 200, "Success delete user by id", result.data);
     } catch (error: any) {
         return errorResponse(res, 500, error.message);
     }

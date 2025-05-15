@@ -2,7 +2,7 @@ import prisma from '../../src/config/prismaClient';
 import supabase from '../../src/config/supabaseClient';
 
 export async function seedUsers() {
-  const company = await prisma.companies.findFirst({ where: { name: 'PT Teknologi Hebat' } });
+  const company = await prisma.companies.findFirst({ where: { id: 'comp-1' } });
 
   const {data} = await supabase.auth.signUp({
     email: "mallexibra@gmail.com",

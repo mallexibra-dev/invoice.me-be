@@ -12,14 +12,32 @@ import { seedUsers } from "./seeders/seedUsers";
 async function main() {
   console.log("Seeding starting.");
 
+  console.log("Seeding plans");
   await seedSubscriptionPlans();
-  await seedCompanies();
+  
+  console.log("Seeding subscriptions");
   await seedSubscriptions();
+
+  console.log("Seeding companies");
+  await seedCompanies();
+
+
+  console.log("Seeding payments");
   await seedPayments();
+
+  console.log("Seeding users");
   await seedUsers();
+
+  console.log("Seeding clients");
   await seedClients();
+
+  console.log("Seeding tasks");
   await seedTasks();
+
+  console.log("Seeding templates");
   await seedTemplates();
+
+  console.log("Seeding invoices");
   await seedInvoices();
 
   console.log("Seeding finishing.");
