@@ -7,7 +7,7 @@ import {
   updateClient,
 } from "../controllers/clientController";
 import { validateData } from "../middlewares/validationData";
-import { clientSchema } from "../schema/clients";
+import { clientSchema } from "../schema/client";
 
 const router = express.Router();
 
