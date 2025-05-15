@@ -1,6 +1,7 @@
 import logger from "../config/logging";
 import prisma from "../config/prismaClient";
 import supabase from "../config/supabaseClient";
+import prismaError from "../errors/prismaError";
 import type { ServiceResponse } from "../types/serviceResponse";
 
 export const createCompanyService = async (
@@ -47,6 +48,13 @@ export const createCompanyService = async (
     return { error: false, data: company };
   } catch (error: any) {
     logger.error(error.message);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
     return { error: true, status: 500, message: error.message };
   }
 };
@@ -69,6 +77,13 @@ export const getCompanyServices = async (
     return { error: false, data: company };
   } catch (error: any) {
     logger.error(error.message);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
     return { error: true, status: 500, message: error.message };
   }
 };
@@ -132,6 +147,13 @@ export const updateCompanyService = async (
     return { error: false, data: updatedCompany };
   } catch (error: any) {
     logger.error(`${error.message}`);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
     return { error: true, status: 500, message: error.message };
   }
 };
@@ -152,7 +174,12 @@ export const deleteCompanyService = async (
     const user = data.user;
     const owner = users.find((u: any) => u.id === user?.id);
 
-    if(!owner) return {error: true, status: 500, message: "You're not owner this company"};
+    if (!owner)
+      return {
+        error: true,
+        status: 500,
+        message: "You're not owner this company",
+      };
 
     for (const user of users) {
       await supabase.auth.admin.deleteUser(user.id);
@@ -176,6 +203,13 @@ export const deleteCompanyService = async (
     return { error: false, data: null };
   } catch (error: any) {
     logger.error(`${error.message}`);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
     return { error: true, status: 500, message: error.message };
   }
 };

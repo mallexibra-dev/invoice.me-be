@@ -7,7 +7,7 @@ export const successResponse = (res: any, code: number, message: string, data?: 
     });
 }
 
-export const errorResponse = (res: any, code: number = 400, message: string) => {
+export const errorResponse = (res: any, code: number = 400, message: string | any[]) => {
     return res.status(code).json({
         status: false,
         code,

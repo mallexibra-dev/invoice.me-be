@@ -34,6 +34,7 @@ export const createCompany = async (req: any, res: any) => {
 export const getMyCompany = async (req: any, res: any) => {
   try {
     const { user_id } = req.query;
+    console.log(user_id)
 
     if (!user_id || typeof user_id !== "string")
       return errorResponse(res, 400, "Invalid or missing ID User");

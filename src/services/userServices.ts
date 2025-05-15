@@ -1,6 +1,7 @@
 import logger from "../config/logging";
 import prisma from "../config/prismaClient"
 import supabase from "../config/supabaseClient";
+import prismaError from "../errors/prismaError";
 import type { ServiceResponse } from "../types/serviceResponse";
 
 export const createUserService = async (dataUser: any): Promise<ServiceResponse> => {
@@ -17,6 +18,8 @@ export const createUserService = async (dataUser: any): Promise<ServiceResponse>
         return {error: false, data: {...user, email: signUp.data.user?.email}};
     } catch (error: any) {
         logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
         return {error: true, status: 500, message: error.message};
     }
 }
@@ -45,6 +48,8 @@ export const createUserWithCompanyService = async (dataUser: any, dataCompany: a
         return {error: false, data: {company, user: {...user, email: signUp.data.user?.email}}};
     } catch (error: any) {
         logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
         return {error: true, status: 500, message: error.message};
     }
 }
@@ -58,6 +63,8 @@ export const getAllUserCompanyService = async (company_id: string): Promise<Serv
         return {error: false, data: users};
     } catch (error: any) {
         logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
         return {error: true, status: 500, message: error.message};
     }
 }
@@ -91,6 +98,8 @@ export const updateUserService = async (id_user: string, dataUser: any, profile_
         return {error: false, data: user};
     } catch (error: any) {
         logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
         return {error: true, status: 500, message: error.message};
     }
 }
@@ -115,6 +124,8 @@ export const deleteUserService = async (id_user: string): Promise<ServiceRespons
         return {error: false, data: null};
     } catch (error: any) {
         logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
         return {error: true, status: 500, message: error.message};
     }
 }

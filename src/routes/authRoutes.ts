@@ -1,6 +1,9 @@
 import express from "express"
 import { loginUser, logoutUser, validateToken } from "../controllers/authController";
 import { registerUserWithCompany } from "../controllers/userController";
+import { validateData } from "../middlewares/validationData";
+import { userLoginSchema } from "../schema/users";
+import { registerCompanyAndUserSchema } from "../schema/company";
 
 const router = express.Router();
 
@@ -37,7 +40,7 @@ const router = express.Router();
  *       200:
  *         description: A list of users
  */
-router.post('/login', loginUser);
+router.post('/login', validateData(userLoginSchema), loginUser);
 
 /**
  * @swagger
@@ -93,7 +96,7 @@ router.post('/login', loginUser);
  *                     example: Jakarta
  *                   phone:
  *                     type: string
- *                     example: "08123456789"
+ *                     example: "0812345678912"
  *                   email:
  *                     type: string
  *                     example: "ptmalikganteng@gmail.com"
@@ -102,11 +105,12 @@ router.post('/login', loginUser);
  *                     example: "#FF5733"
  *                   subscription_id:
  *                     type: string
+ *                     example: 79e69d37-5763-4b03-bc7f-ac507826222b
  *     responses:
  *       200:
  *         description: Successfully registered user and company
  */
-router.post('/register/company', registerUserWithCompany);
+router.post('/register/company', validateData(registerCompanyAndUserSchema), registerUserWithCompany);
 
 /**
  * @swagger

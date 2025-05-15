@@ -72,14 +72,14 @@ router.post("/", upload.single("logo"), createCompany);
  * /companies/my:
  *   get:
  *     tags: [Company]
- *     summary: Get company by ID
+ *     summary: Get company by ID User
  *     parameters:
  *       - in: query
  *         name: user_id
  *         schema:
  *           type: string
  *         required: true
- *         description: ID of the company
+ *         description: ID of the user
  *     responses:
  *       200:
  *         description: Company data fetched successfully
