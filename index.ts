@@ -7,6 +7,7 @@ import authMiddleware from "./src/middlewares/auth";
 import userRoutes from "./src/routes/userRoutes";
 import companyRouter from "./src/routes/companyRoutes";
 import authRoutes from "./src/routes/authRoutes";
+import clientRoutes from "./src/routes/clientRoutes";
 
 const app = express();
 const port = process.env.PORT;
@@ -24,6 +25,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', authRoutes);
 app.use('/api/users', authMiddleware, userRoutes)
 app.use('/api/companies', authMiddleware, companyRouter)
+app.use('/api/clients', authMiddleware, clientRoutes)
 
 app.use((err: any, req: any, res: any, next: any)=>{
   logger.error(`${err.message}`);

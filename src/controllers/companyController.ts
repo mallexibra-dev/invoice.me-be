@@ -1,6 +1,4 @@
 import logger from "../config/logging";
-import prisma from "../config/prismaClient";
-import supabase from "../config/supabaseClient";
 import { createCompanyService, deleteCompanyService, getCompanyServices, updateCompanyService } from "../services/companyServices";
 import { errorResponse, successResponse } from "../utils/response";
 
