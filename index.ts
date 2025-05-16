@@ -11,6 +11,9 @@ import clientRoutes from "./src/routes/clientRoutes";
 import paymentRoutes from "./src/routes/paymentRoutes";
 import taskRoutes from "./src/routes/taskRoutes";
 import templateRoutes from "./src/routes/templateRoutes";
+import invoiceRoutes from "./src/routes/invoiceRoutes";
+import invoiceItemRoutes from "./src/routes/invoiceItemRoutes";
+import reminderRoutes from "./src/routes/reminderRoutes";
 
 const app = express();
 const port = process.env.PORT;
@@ -32,6 +35,9 @@ app.use('/api/clients', authMiddleware, clientRoutes)
 app.use('/api/payments', authMiddleware, paymentRoutes)
 app.use('/api/tasks', authMiddleware, taskRoutes)
 app.use('/api/templates', authMiddleware, templateRoutes);
+app.use('/api/invoices', authMiddleware, invoiceRoutes);
+app.use('/api/invoice-items', authMiddleware, invoiceItemRoutes);
+app.use('/api/reminder-schedules', authMiddleware, reminderRoutes);
 
 app.use((err: any, req: any, res: any, next: any)=>{
   logger.error(`${err.message}`);

@@ -116,7 +116,7 @@ model Tasks {
   company_id  String
   title       String
   description String?
-  unit_price  Int?
+  unit_price  Int
 
   company Companies @relation(fields: [company_id], references: [id])
 }
@@ -139,7 +139,6 @@ model InvoiceItem {
   id          String  @id @default(uuid())
   invoice_id  String
   title       String
-  description String  @db.Text
   unit_price  Decimal
   quantity    Int
   total       Decimal
@@ -178,7 +177,7 @@ model Invoices {
   user_id        String
   invoice_number String
   title          String
-  status         InvoiceStatus
+  status         InvoiceStatus @default(unpaid)
   issue_date     DateTime
   due_date       DateTime
   notes          String?       @db.Text
