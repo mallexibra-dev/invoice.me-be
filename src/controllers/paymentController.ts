@@ -17,6 +17,8 @@ export const createPayment = async (req: Request, res: Response) => {
 
     const result = await createPaymentService(company_id, payment);
 
+    if(result.error) return errorResponse(res, result.status, result.message!);
+
     return successResponse(
       res,
       200,
@@ -36,6 +38,8 @@ export const getPayment = async (req: Request, res: Response) => {
 
     const result = await getPaymentService(payment_id);
 
+    if(result.error) return errorResponse(res, result.status, result.message!);
+
     return successResponse(res, 200, "Get payment successfully", result.data);
   } catch (error: any) {
     return errorResponse(res, 500, "Something wrong");
@@ -49,6 +53,8 @@ export const getPayments = async (req: Request, res: Response) => {
       return errorResponse(res, 404, "Invalid company id");
 
     const result = await getAllPaymentService(company_id);
+
+    if(result.error) return errorResponse(res, result.status, result.message!);
 
     return successResponse(res, 200, "Get payments successfully", result.data);
   } catch (error: any) {
@@ -64,6 +70,8 @@ export const updatePayment = async (req: Request, res: Response) => {
       return errorResponse(res, 404, "Invalid payment id");
 
     const result = await updatePaymentService(payment_id, payment);
+
+    if(result.error) return errorResponse(res, result.status, result.message!);
 
     return successResponse(
       res,
@@ -82,7 +90,9 @@ export const deletePayment = async (req: Request, res: Response) => {
     if (!payment_id || payment_id === "")
       return errorResponse(res, 404, "Invalid payment id");
 
-    await deletePaymentService(payment_id);
+    const result = await deletePaymentService(payment_id);
+
+    if(result.error) return errorResponse(res, result.status, result.message!);
 
     return successResponse(res, 200, "Delete payment successfully");
   } catch (error: any) {

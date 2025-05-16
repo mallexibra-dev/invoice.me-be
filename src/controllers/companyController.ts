@@ -34,7 +34,7 @@ export const getMyCompany = async (req: any, res: any) => {
 
     const result = await getCompanyServices(user_id)
 
-    if (result.error) return errorResponse(res, 404, "Company not found");
+    if (result.error) return errorResponse(res, result.status, result.message!);
 
     return successResponse(res, 200, "Get data company successfully", result.data);
   } catch (error) {
@@ -54,6 +54,8 @@ export const updateCompany = async (req: any, res: any) => {
     }
 
     const result = await updateCompanyService(token, company_id, file, updateFields);
+
+    if(result.error) return errorResponse(res, result.status, result.message!);
 
     return successResponse(
       res,
