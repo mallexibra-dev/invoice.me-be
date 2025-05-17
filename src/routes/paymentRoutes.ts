@@ -32,26 +32,23 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - company_id
- *               - name
- *               - type
+ *               - wallet_id
+ *               - account_name
+ *               - account_number
  *               - is_default
  *             properties:
  *               company_id:
  *                 type: string
  *                 example: 123e4567-e89b-12d3-a456-426614174000
- *               name:
+ *               wallet_id:
  *                 type: string
- *                 example: BCA Virtual Account
+ *                 example: 123e4567-e89b-12d3-a456-426614174000
  *               account_name:
  *                 type: string
  *                 example: PT Contoh
  *               account_number:
  *                 type: string
  *                 example: 1234567890
- *               type:
- *                 type: string
- *                 enum: [bank, ewallet, cash, other]
- *                 example: bank
  *               is_default:
  *                 type: boolean
  *                 example: true
@@ -85,16 +82,15 @@ router.post('/', validateData(paymentSchema), createPayment);
  *               name:
  *                 type: string
  *                 example: BCA Updated
+ *               wallet_id:
+ *                 type: string
+ *                 example: 123e4567-e89b-12d3-a456-426614174000
  *               account_name:
  *                 type: string
  *                 example: PT Contoh Baru
  *               account_number:
  *                 type: string
  *                 example: 987654321
- *               type:
- *                 type: string
- *                 enum: [bank, ewallet, cash, other]
- *                 example: bank
  *               is_default:
  *                 type: boolean
  *                 example: false

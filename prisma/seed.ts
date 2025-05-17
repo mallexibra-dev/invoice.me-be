@@ -21,7 +21,6 @@ async function main() {
   console.log("Seeding companies");
   await seedCompanies();
 
-
   console.log("Seeding payments");
   await seedPayments();
 

@@ -8,15 +8,11 @@
   - Added the required column `account_name` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `account_number` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `is_default` to the `Payment` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `name` to the `Payment` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `type` to the `Payment` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `wallet_id` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `name` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `role` to the `User` table without a default value. This is not possible if the table is not empty.
 
 */
--- CreateEnum
-CREATE TYPE "PaymentType" AS ENUM ('bank', 'ewallet', 'cash', 'other');
-
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('owner', 'admin', 'administrator');
 
@@ -28,6 +24,9 @@ CREATE TYPE "ReminderChannel" AS ENUM ('whatsapp', 'email');
 
 -- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('unpaid', 'paid', 'overdue');
+
+-- CreateEnum
+CREATE TYPE "WalletType" AS ENUM ('bank', 'ewallet');
 
 -- DropForeignKey
 ALTER TABLE "Subscriptions" DROP CONSTRAINT "Subscriptions_company_id_fkey";
@@ -44,8 +43,7 @@ ALTER COLUMN "logo" DROP NOT NULL;
 ALTER TABLE "Payment" ADD COLUMN     "account_name" TEXT NOT NULL,
 ADD COLUMN     "account_number" TEXT NOT NULL,
 ADD COLUMN     "is_default" BOOLEAN NOT NULL,
-ADD COLUMN     "name" TEXT NOT NULL,
-ADD COLUMN     "type" "PaymentType" NOT NULL;
+ADD COLUMN     "wallet_id" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Subscriptions" DROP COLUMN "company_id",
@@ -137,6 +135,16 @@ CREATE TABLE "Invoices" (
     CONSTRAINT "Invoices_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Wallet" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "type" "WalletType" NOT NULL,
+    "logo" TEXT NOT NULL,
+
+    CONSTRAINT "Wallet_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Clients_email_key" ON "Clients"("email");
 
@@ -145,6 +153,9 @@ CREATE UNIQUE INDEX "Companies_subscription_id_key" ON "Companies"("subscription
 
 -- AddForeignKey
 ALTER TABLE "Companies" ADD CONSTRAINT "Companies_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "Subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_wallet_id_fkey" FOREIGN KEY ("wallet_id") REFERENCES "Wallet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -61,21 +61,15 @@ model SubscriptionPLan {
 
 model Payment {
   id             String      @id @default(uuid())
-  name           String
   account_name   String
   account_number String
-  type           PaymentType
   is_default     Boolean
+
+  wallet_id String
+  wallet Wallet @relation(fields: [wallet_id], references: [id])
 
   company_id String
   company    Companies @relation(fields: [company_id], references: [id])
-}
-
-enum PaymentType {
-  bank
-  ewallet
-  cash
-  other
 }
 
 model User {
@@ -88,7 +82,7 @@ model User {
   company Companies? @relation(fields: [company_id], references: [id])
 
   Templates Templates[]
-  Invoices Invoices[]
+  Invoices  Invoices[]
 }
 
 enum UserRole {
@@ -136,12 +130,12 @@ model Templates {
 }
 
 model InvoiceItem {
-  id          String  @id @default(uuid())
-  invoice_id  String
-  title       String
-  unit_price  Decimal
-  quantity    Int
-  total       Decimal
+  id         String  @id @default(uuid())
+  invoice_id String
+  title      String
+  unit_price Decimal
+  quantity   Int
+  total      Decimal
 
   invoice Invoices @relation(fields: [invoice_id], references: [id])
 }
@@ -197,4 +191,18 @@ enum InvoiceStatus {
   unpaid
   paid
   overdue
+}
+
+model Wallet {
+  id   String @id @default(uuid())
+  name String
+  type WalletType
+  logo String
+
+  Payment Payment[]
+}
+
+enum WalletType {
+  bank
+  ewallet
 }
