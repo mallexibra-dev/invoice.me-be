@@ -10,7 +10,6 @@
   - Added the required column `is_default` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `name` to the `Payment` table without a default value. This is not possible if the table is not empty.
   - Added the required column `type` to the `Payment` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `company_id` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `name` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `role` to the `User` table without a default value. This is not possible if the table is not empty.
 
@@ -19,7 +18,7 @@
 CREATE TYPE "PaymentType" AS ENUM ('bank', 'ewallet', 'cash', 'other');
 
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('owner', 'admin');
+CREATE TYPE "UserRole" AS ENUM ('owner', 'admin', 'administrator');
 
 -- CreateEnum
 CREATE TYPE "ReminderType" AS ENUM ('before_due', 'on_due', 'after_due');
@@ -53,7 +52,7 @@ ALTER TABLE "Subscriptions" DROP COLUMN "company_id",
 ALTER COLUMN "start_date" SET DEFAULT CURRENT_TIMESTAMP;
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "company_id" TEXT NOT NULL,
+ALTER TABLE "User" ADD COLUMN     "company_id" TEXT,
 ADD COLUMN     "name" TEXT NOT NULL,
 ADD COLUMN     "profile_image" TEXT,
 ADD COLUMN     "role" "UserRole" NOT NULL;
@@ -77,7 +76,7 @@ CREATE TABLE "Tasks" (
     "company_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "unit_price" INTEGER,
+    "unit_price" INTEGER NOT NULL,
 
     CONSTRAINT "Tasks_pkey" PRIMARY KEY ("id")
 );
@@ -99,7 +98,6 @@ CREATE TABLE "InvoiceItem" (
     "id" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
     "unit_price" DECIMAL(65,30) NOT NULL,
     "quantity" INTEGER NOT NULL,
     "total" DECIMAL(65,30) NOT NULL,
@@ -129,7 +127,7 @@ CREATE TABLE "Invoices" (
     "user_id" TEXT NOT NULL,
     "invoice_number" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "status" "InvoiceStatus" NOT NULL,
+    "status" "InvoiceStatus" NOT NULL DEFAULT 'unpaid',
     "issue_date" TIMESTAMP(3) NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
     "notes" TEXT,
@@ -149,7 +147,7 @@ CREATE UNIQUE INDEX "Companies_subscription_id_key" ON "Companies"("subscription
 ALTER TABLE "Companies" ADD CONSTRAINT "Companies_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "Subscriptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Clients" ADD CONSTRAINT "Clients_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -80,21 +80,21 @@ enum PaymentType {
 
 model User {
   id            String   @id @default(uuid())
-  company_id    String
+  company_id    String?
   name          String
   role          UserRole
   profile_image String?
 
-  company Companies @relation(fields: [company_id], references: [id])
+  company Companies? @relation(fields: [company_id], references: [id])
 
   Templates Templates[]
-
   Invoices Invoices[]
 }
 
 enum UserRole {
   owner
   admin
+  administrator
 }
 
 model Clients {

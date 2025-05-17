@@ -9,6 +9,20 @@ export async function seedUsers() {
     password: "admin-123"
   });
 
+  const {data: administrator} = await supabase.auth.signUp({
+    email: "administrator@gmail.com",
+    password: "admin-123"
+  });
+
+  if(administrator) await prisma.user.create({
+    data: {
+      id: administrator.user?.id,
+      role: "administrator",
+      name: "Administrator",
+      company_id: null
+    }
+  })
+
   if (company) {
     await prisma.user.create({
       data: {
