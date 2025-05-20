@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteUser, getAllData, registerUser, updateUser } from "../controllers/userController";
+import { deleteUser, getAllData, getData, registerUser, updateUser } from "../controllers/userController";
 import multer from "multer";
 import { validateData } from "../middlewares/validationData";
 import { userSchema } from "../schema/users";
@@ -94,12 +94,41 @@ router.patch('/:user_id', upload.single('profile_image'), validateData(userSchem
 
 /**
  * @swagger
- * /users/{user_id}:
- *   delete:
+ * /users:
+ *   get:
  *     tags: [User]
- *     summary: Delete user by id
+ *     summary: Get all user by company id
  *     parameters:
  *       - in: query
+ *         name: company_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: Get data User data successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/', getAllData)
+
+/**
+ * @swagger
+ * /users/{user_id}:
+ *   get:
+ *     tags: [User]
+ *     summary: Get user by  id
+ *     parameters:
+ *       - in: query
+ *         name: company_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Company ID of the user
+ *       - in: path
  *         name: user_id
  *         schema:
  *           type: string
@@ -107,7 +136,30 @@ router.patch('/:user_id', upload.single('profile_image'), validateData(userSchem
  *         description: ID of the user
  *     responses:
  *       200:
- *         description: User data updated successfully
+ *         description: Get data User data successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:user_id', getData);
+
+/**
+ * @swagger
+ * /users/{user_id}:
+ *   delete:
+ *     tags: [User]
+ *     summary: Delete user by id
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: User data deleted successfully
  *       404:
  *         description: User not found
  *       500:

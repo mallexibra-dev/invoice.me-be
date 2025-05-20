@@ -14,7 +14,8 @@ import templateRoutes from "./src/routes/templateRoutes";
 import invoiceRoutes from "./src/routes/invoiceRoutes";
 import invoiceItemRoutes from "./src/routes/invoiceItemRoutes";
 import reminderRoutes from "./src/routes/reminderRoutes";
-import subscriptionPlan from "./src/routes/subscriptionRoutes";
+import subscriptionPlanRoutes from "./src/routes/subscriptionRoutes";
+import walletRoutes from "./src/routes/walletRoutes";
 
 const app = express();
 const port = process.env.PORT;
@@ -39,7 +40,8 @@ app.use('/api/templates', authMiddleware, templateRoutes);
 app.use('/api/invoices', authMiddleware, invoiceRoutes);
 app.use('/api/invoice-items', authMiddleware, invoiceItemRoutes);
 app.use('/api/reminder-schedules', authMiddleware, reminderRoutes);
-app.use('/api/subscriptions-plans', authMiddleware, subscriptionPlan)
+app.use('/api/subscriptions-plans', authMiddleware, subscriptionPlanRoutes)
+app.use('/api/wallets', authMiddleware, walletRoutes);
 
 app.use((err: any, req: any, res: any, next: any)=>{
   logger.error(`${err.message}`);

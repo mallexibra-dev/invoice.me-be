@@ -7,7 +7,7 @@ export const createSubscriptionPlan = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
     const data = req.body;
     try {
-        if(!token) return errorResponse(res, 401, "Unauthorized");
+        if(!token || token == "") return errorResponse(res, 401, "Unauthorized");
 
         const result = await createSubscriptionPlanService(token, data);
 
@@ -25,7 +25,7 @@ export const updateSubscriptionPlan = async (req: Request, res: Response) => {
     const {plan_id} = req.params;
     const data = req.body;
     try {
-        if(!token) return errorResponse(res, 401, "Unauthorized");
+        if(!token || token == "") return errorResponse(res, 401, "Unauthorized");
 
         if(!plan_id || plan_id === "") return errorResponse(res, 400, "Invalid plan id");
         
@@ -73,7 +73,7 @@ export const deleteSubscriptionPlan = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
     const {plan_id} = req.params;
     try {
-        if(!token) return errorResponse(res, 401, "Unauthorized");
+        if(!token || token == "") return errorResponse(res, 401, "Unauthorized");
         
         const result = await deleteSubscriptionPlanService(token, plan_id);
 

@@ -69,15 +69,32 @@ export const getAllUserCompanyService = async (company_id: string): Promise<Serv
     }
 }
 
+export const getUserCompanyService = async (companyId: string, userId: string): Promise<ServiceResponse> => {
+    try {
+        const user = await prisma.user.findFirst({where: {company_id: companyId, id: userId}});
+
+        if(!userId) return {error: true, status: 404, message: "User not found"}
+
+        return {error: false, data: user};
+    } catch (error: any) {
+        logger.error(`${error.message}`);
+        const errorPrisma = prismaError(error);
+        if(errorPrisma?.error) return {error: true, status: errorPrisma.statusCode, message: errorPrisma.message};
+        return {error: true, status: 500, message: error.message};
+    }
+}
+
 export const updateUserService = async (id_user: string, dataUser: any, profile_image: any): Promise<ServiceResponse> => {
     try {
         const {name, password} = dataUser;
         const userTemp = await prisma.user.findFirst({where: {id: id_user}});
-        if(userTemp?.profile_image != null) {
-            const {data, error} = await supabase.storage.from('profiles').remove([userTemp?.profile_image]);
-            
-          if (error) return {error: true, status: 500, message: error.message};
-        }else if(profile_image){
+        
+        if(profile_image){
+            if(userTemp?.profile_image != null) {
+                const {data, error} = await supabase.storage.from('profiles').remove([userTemp?.profile_image]);
+                
+              if (error) return {error: true, status: 500, message: error.message};
+            }
             const fileName = `users-profile/${Date.now()}-${profile_image.originalname}`;
             const {data, error} = await supabase.storage.from('profiles').upload(fileName, profile_image.buffer, {
                 contentType: profile_image.mimetype,

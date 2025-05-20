@@ -1,4 +1,4 @@
-import { createUserService, createUserWithCompanyService, deleteUserService, getAllUserCompanyService, updateUserService } from "../services/userServices";
+import { createUserService, createUserWithCompanyService, deleteUserService, getAllUserCompanyService, getUserCompanyService, updateUserService } from "../services/userServices";
 import { errorResponse, successResponse } from "../utils/response";
 
 export const registerUser = async (req: any, res: any)=>{
@@ -34,6 +34,24 @@ export const getAllData = async (req: any, res: any)=> {
         if(company_id == null || typeof company_id !== "string") return errorResponse(res, 404, "Not valid company");
 
         const result = await getAllUserCompanyService(company_id);
+
+        if(result.error) return errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Success get data users", result.data);
+    } catch (error: any) {
+        return errorResponse(res, 500, error.message);
+    }
+}
+
+export const getData = async (req: any, res: any)=> {
+    const {company_id} = req.query;
+    const {user_id} = req.params;
+    try {
+        if(!company_id || typeof company_id !== "string") return errorResponse(res, 400, "Not valid company");
+
+        if(!user_id || user_id == "") return errorResponse(res, 400, "Not valid id user");
+
+        const result = await getUserCompanyService(company_id, user_id);
 
         if(result.error) return errorResponse(res, result.status, result.message!);
 

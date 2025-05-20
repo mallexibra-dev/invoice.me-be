@@ -35,7 +35,8 @@ ALTER TABLE "Subscriptions" DROP CONSTRAINT "Subscriptions_company_id_fkey";
 DROP INDEX "Subscriptions_company_id_key";
 
 -- AlterTable
-ALTER TABLE "Companies" ADD COLUMN     "subscription_id" TEXT NOT NULL,
+ALTER TABLE "Companies" ADD COLUMN     "amount" INTEGER,
+ADD COLUMN     "subscription_id" TEXT NOT NULL,
 ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15),
 ALTER COLUMN "logo" DROP NOT NULL;
 
@@ -128,6 +129,7 @@ CREATE TABLE "Invoices" (
     "status" "InvoiceStatus" NOT NULL DEFAULT 'unpaid',
     "issue_date" TIMESTAMP(3) NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
+    "paid_at" TIMESTAMP(3),
     "notes" TEXT,
     "template_id" TEXT NOT NULL,
     "total" DECIMAL(65,30) NOT NULL,
@@ -140,13 +142,30 @@ CREATE TABLE "Wallet" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "type" "WalletType" NOT NULL,
-    "logo" TEXT NOT NULL,
+    "logo" TEXT,
 
     CONSTRAINT "Wallet_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Transaction" (
+    "id" TEXT NOT NULL,
+    "order_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "gross_amount" INTEGER NOT NULL,
+    "net_amount" INTEGER NOT NULL,
+    "fee" INTEGER NOT NULL,
+    "payment_method" TEXT NOT NULL,
+    "paid_at" TIMESTAMP(3),
+
+    CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Clients_email_key" ON "Clients"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Transaction_order_id_key" ON "Transaction"("order_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Companies_subscription_id_key" ON "Companies"("subscription_id");
@@ -189,3 +208,6 @@ ALTER TABLE "Invoices" ADD CONSTRAINT "Invoices_user_id_fkey" FOREIGN KEY ("user
 
 -- AddForeignKey
 ALTER TABLE "Invoices" ADD CONSTRAINT "Invoices_template_id_fkey" FOREIGN KEY ("template_id") REFERENCES "Templates"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

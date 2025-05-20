@@ -15,7 +15,7 @@ export const createCompanyService = async (
     const { data } = await supabase.auth.getUser(token);
     const user = await prisma.user.findFirst({ where: { id: data.user?.id } });
 
-    if (user?.company_id != null || user?.company_id != "")
+    if (user?.company_id != null)
       return {
         error: true,
         status: 500,
@@ -74,7 +74,7 @@ export const getCompanyServices = async (
     if (!user) return { error: true, status: 404, message: "User not found" };
 
     const company = await prisma.companies.findFirst({
-      where: { id: user?.company_id },
+      where: { id: user.company_id! },
     });
 
     if (!company)

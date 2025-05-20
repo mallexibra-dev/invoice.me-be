@@ -1,10 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
+  generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
@@ -22,15 +16,17 @@ model Companies {
   phone           String        @db.VarChar(15)
   logo            String?
   brand_color     String
+  amount          Int?
   payments        Payment[]
   users           User[]
   subscription_id String        @unique
   subscription    Subscriptions @relation(fields: [subscription_id], references: [id])
 
-  Clients   Clients[]
-  Tasks     Tasks[]
-  Templates Templates[]
-  Invoices  Invoices[]
+  Clients     Clients[]
+  Tasks       Tasks[]
+  Templates   Templates[]
+  Invoices    Invoices[]
+  Transaction Transaction[]
 
   @@index([email, id])
 }
@@ -60,13 +56,13 @@ model SubscriptionPLan {
 }
 
 model Payment {
-  id             String      @id @default(uuid())
+  id             String  @id @default(uuid())
   account_name   String
   account_number String
   is_default     Boolean
 
   wallet_id String
-  wallet Wallet @relation(fields: [wallet_id], references: [id])
+  wallet    Wallet @relation(fields: [wallet_id], references: [id])
 
   company_id String
   company    Companies @relation(fields: [company_id], references: [id])
@@ -174,6 +170,7 @@ model Invoices {
   status         InvoiceStatus @default(unpaid)
   issue_date     DateTime
   due_date       DateTime
+  paid_at        DateTime?
   notes          String?       @db.Text
   template_id    String
   total          Decimal
@@ -194,10 +191,10 @@ enum InvoiceStatus {
 }
 
 model Wallet {
-  id   String @id @default(uuid())
+  id   String     @id @default(uuid())
   name String
   type WalletType
-  logo String
+  logo String?
 
   Payment Payment[]
 }
@@ -205,4 +202,17 @@ model Wallet {
 enum WalletType {
   bank
   ewallet
+}
+
+model Transaction {
+  id             String    @id @default(cuid())
+  order_id       String    @unique
+  company_id     String
+  gross_amount   Int
+  net_amount     Int
+  fee            Int
+  payment_method String
+  paid_at        DateTime?
+
+  company Companies @relation(fields: [company_id], references: [id])
 }

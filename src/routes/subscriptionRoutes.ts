@@ -18,7 +18,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   - name: SubscriptionPlan
- *     description: Management Subscription Plans
+ *     description: Management Master Data Subscription Plans
  */
 /**
  * @swagger
