@@ -35,7 +35,7 @@ ALTER TABLE "Subscriptions" DROP CONSTRAINT "Subscriptions_company_id_fkey";
 DROP INDEX "Subscriptions_company_id_key";
 
 -- AlterTable
-ALTER TABLE "Companies" ADD COLUMN     "amount" INTEGER,
+ALTER TABLE "Companies" ADD COLUMN     "amount" INTEGER NOT NULL DEFAULT 0,
 ADD COLUMN     "subscription_id" TEXT NOT NULL,
 ALTER COLUMN "phone" SET DATA TYPE VARCHAR(15),
 ALTER COLUMN "logo" DROP NOT NULL;
@@ -132,7 +132,7 @@ CREATE TABLE "Invoices" (
     "paid_at" TIMESTAMP(3),
     "notes" TEXT,
     "template_id" TEXT NOT NULL,
-    "total" DECIMAL(65,30) NOT NULL,
+    "total" INTEGER NOT NULL,
 
     CONSTRAINT "Invoices_pkey" PRIMARY KEY ("id")
 );
@@ -156,7 +156,8 @@ CREATE TABLE "Transaction" (
     "net_amount" INTEGER NOT NULL,
     "fee" INTEGER NOT NULL,
     "payment_method" TEXT NOT NULL,
-    "paid_at" TIMESTAMP(3),
+    "status" TEXT,
+    "update_at" TIMESTAMP(3),
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );

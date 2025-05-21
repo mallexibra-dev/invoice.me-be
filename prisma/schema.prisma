@@ -1,4 +1,4 @@
-  generator client {
+generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
@@ -16,7 +16,7 @@ model Companies {
   phone           String        @db.VarChar(15)
   logo            String?
   brand_color     String
-  amount          Int?
+  amount          Int           @default(0)
   payments        Payment[]
   users           User[]
   subscription_id String        @unique
@@ -173,7 +173,7 @@ model Invoices {
   paid_at        DateTime?
   notes          String?       @db.Text
   template_id    String
-  total          Decimal
+  total          Int
 
   company  Companies @relation(fields: [company_id], references: [id])
   client   Clients   @relation(fields: [client_id], references: [id])
@@ -205,14 +205,15 @@ enum WalletType {
 }
 
 model Transaction {
-  id             String    @id @default(cuid())
+  id             String    @id @default(uuid())
   order_id       String    @unique
   company_id     String
   gross_amount   Int
   net_amount     Int
   fee            Int
   payment_method String
-  paid_at        DateTime?
+  status         String?
+  update_at      DateTime?
 
   company Companies @relation(fields: [company_id], references: [id])
 }
