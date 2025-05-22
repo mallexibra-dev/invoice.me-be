@@ -5,6 +5,42 @@ import type { ServiceResponse } from "../types/serviceResponse";
 import { midtransApi } from "../utils/midtransAPI";
 import crypto from "crypto";
 
+export const sendTransaction = async (invoiceId: string): Promise<ServiceResponse> => {
+  try {
+    const invoice = await prisma.invoices.findFirst({where: {id: invoiceId}});
+
+    if(!invoice) return {error: true, status: 404, message: "Invoice not found"};
+
+    const transactionUnpaid = await prisma.transaction.findFirst({where: {order_id: invoiceId, status: "unpaid"}});
+    if(transactionUnpaid) return {error: true, status: 406, message: "Cannot create duplicate transaction"};
+
+    const transactionCreate = await prisma.transaction.create({
+      data: {
+        order_id: invoiceId,
+        company_id: invoice.company_id,
+        type: "invoice",
+        net_amount: invoice.total,
+        status: "unpaid",
+        update_at: new Date()
+      },
+    });
+
+    // Send email payment link
+    return {error: false, data: transactionCreate};
+  } catch (error: any) {
+    logger.error(error.message);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
+
+    return { error: true, status: 500, message: "Something wrong." };
+  }
+}
+
 export const chargeTransactionService = async (
   paymentType: string,
   transactionDetails: any,
@@ -13,7 +49,7 @@ export const chargeTransactionService = async (
 ): Promise<ServiceResponse> => {
   try {
     const invoice = await prisma.invoices.findFirst({
-      where: { id: transactionDetails.order_id },
+      where: { id: transactionDetails.order_id},
     });
 
     if (!invoice)
@@ -36,14 +72,14 @@ export const chargeTransactionService = async (
       if(transactionDetails.gross_amount !== (amount.net_amount + amount.fee)) return {error: true, status: 400, message: "Invalid gross amount"}
 
     const transactionOld = await prisma.transaction.findFirst({
-      where: { order_id: transactionDetails.order_id },
+      where: { order_id: transactionDetails.order_id, status: "pending" },
     });
 
     if (transactionOld)
       return {
         error: true,
         status: 400,
-        message: "Cannot create duplikat transaction",
+        message: "Cannot charge transaction again",
       };
 
     const data = {
@@ -62,15 +98,14 @@ export const chargeTransactionService = async (
         message: response.data.status_message,
       };
 
-    const transaction = await prisma.transaction.create({
+    const transaction = await prisma.transaction.update({
       data: {
-        order_id: transactionDetails.order_id,
-        company_id: invoice.company_id,
         gross_amount: transactionDetails.gross_amount,
-        net_amount: amount.net_amount,
         fee: amount.fee,
+        status: "pending",
         payment_method: paymentType,
-      },
+        update_at: new Date(),
+      }, where: {order_id: transactionDetails.order_id, status: "unpaid"}
     });
 
     if (!transaction) {
@@ -98,10 +133,39 @@ export const chargeTransactionService = async (
   }
 };
 
+export const cancelSendInvoice = async (orderId: string): Promise<ServiceResponse> => {
+  try {
+    const invoice = await prisma.invoices.findFirst({where: {id: orderId}});
+    if(!invoice) return {error: true, status: 404, message: "Invoice not found"};
+    if(invoice.status === "paid") return {error: true, status: 406, message: "Invoice already paid"};
+
+    const transaction = await prisma.transaction.findFirst({where: {order_id: invoice.id, status: "unpaid"}});
+    if(!transaction) return {error: true, status: 404, message: "Transaction not found"};
+
+    const transactionToUpdate = await prisma.transaction.update({where: {order_id: orderId, status: "cancelled"}, data:{status: "cancelled", update_at: new Date()}});
+
+    return {error: false, data: null};
+  } catch (error: any) {
+    logger.error(error.message);
+    const errorPrisma = prismaError(error);
+    if (errorPrisma?.error)
+      return {
+        error: true,
+        status: errorPrisma.statusCode,
+        message: errorPrisma.message,
+      };
+
+    return { error: true, status: 500, message: "Something wrong" };
+  }
+}
+
 export const cancelTransactionService = async (
   orderId: string
 ): Promise<ServiceResponse> => {
   try {
+    const transaction = await prisma.transaction.findFirst({where: {order_id: orderId, status: "pending"}});
+    if(!transaction) return {error: true, status: 404, message: "Transaction not found"};
+
     const response = await midtransApi.post(`/v2/${orderId}/cancel`);
     const data = response.data;
 
@@ -113,9 +177,9 @@ export const cancelTransactionService = async (
       };
     }
 
-    await prisma.transaction.delete({ where: { order_id: orderId } });
+    await prisma.transaction.update({where: {order_id: orderId, status: "pending"}, data: {status: "cancelled", update_at: new Date()}});
     
-    return { error: false, data: data };
+    return { error: false, data };
   } catch (error: any) {
     logger.error(error.message);
     const errorPrisma = prismaError(error);
@@ -189,75 +253,90 @@ export const notificationTransactionService = async (
       transaction_status === "settlement" ||
       (transaction_status === "capture" && fraud_status === "accept")
     ) {
-      const invoices = await prisma.invoices.findFirst({
-        where: { id: order_id },
-      });
-
-      if (!invoices)
-        return { error: true, status: 404, message: "Invoice not found" };
-
-      if (invoices.status === "paid")
-        return { error: true, status: 400, message: "Invoice already paid" };
-
-      const company = await prisma.companies.findFirst({
-        where: { id: invoices?.company_id },
-      });
-
-      if (!company)
-        return { error: true, status: 404, message: "Company not found" };
+      if(transaction.type === "invoice") {
+        const invoices = await prisma.invoices.findFirst({
+          where: { id: order_id },
+        });
+  
+        if (!invoices)
+          return { error: true, status: 404, message: "Invoice not found" };
+  
+        if (invoices.status === "paid")
+          return { error: true, status: 400, message: "Invoice already paid" };
+  
+        const company = await prisma.companies.findFirst({
+          where: { id: invoices?.company_id },
+        });
+  
+        if (!company)
+          return { error: true, status: 404, message: "Company not found" };
+  
+        await prisma.invoices.update({
+          where: { id: order_id },
+          data: {
+            status: "paid",
+            paid_at: new Date(),
+          },
+        });
+  
+        await prisma.companies.update({
+          where: { id: invoices?.company_id },
+          data: {
+            amount: (company?.amount || 0) + (invoices?.total || 0),
+          },
+        });
+      }else if(transaction.type === "subscription"){
+        const company = await prisma.companies.findFirst({
+          where: { id: transaction?.company_id },
+        });
+  
+        if (!company)
+          return { error: true, status: 404, message: "Company not found" };
+  
+        await prisma.subscriptions.update({where: {id: company.subscription_id}, data: {
+          plan_id: transaction.plan_id ? { set: transaction.plan_id } : undefined
+        }});
+      }
 
       await prisma.transaction.update({
         where: { order_id },
         data: {
           update_at: new Date(),
-          status: "PAID",
-          payment_method: payment_type,
-        },
-      });
-
-      await prisma.invoices.update({
-        where: { id: order_id },
-        data: {
           status: "paid",
-          paid_at: new Date(),
-        },
-      });
-
-      await prisma.companies.update({
-        where: { id: invoices?.company_id },
-        data: {
-          amount: (company?.amount || 0) + (invoices?.total || 0),
+          payment_method: payment_type,
         },
       });
     } else if (
       transaction_status === "expire" ||
       transaction_status === "cancel"
     ) {
-      const invoices = await prisma.invoices.findFirst({
-        where: { id: order_id, status: "paid" },
-      });
-      if (invoices)
-        return {
-          error: true,
-          status: 400,
-          message: "Cannot change status transaction",
-        };
+      if(transaction.type === "invoice") {
+        await prisma.invoices.update({
+          where: { id: order_id },
+          data: {
+            status: "unpaid",
+            paid_at: null,
+          },
+        });
+        const invoices = await prisma.invoices.findFirst({
+          where: { id: order_id, status: "paid" },
+        });
+        if (invoices)
+          return {
+            error: true,
+            status: 400,
+            message: "Cannot change status transaction",
+          };
+      }
 
       await prisma.transaction.update({
         where: { order_id },
         data: {
-          status: "FAILED",
+          status: "failed",
           update_at: new Date(),
         },
       });
 
-      await prisma.invoices.update({
-        where: { id: order_id },
-        data: {
-          status: "unpaid",
-          paid_at: null,
-        },
-      });
     }
 
     return { error: false, data: null };

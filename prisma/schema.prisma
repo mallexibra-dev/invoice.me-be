@@ -45,7 +45,7 @@ model Subscriptions {
 model SubscriptionPLan {
   id                String  @id @default(uuid())
   name              String
-  price             Decimal
+  price             Int
   max_users         Int
   max_invoices      Int
   whatsapp_reminder Boolean
@@ -53,6 +53,8 @@ model SubscriptionPLan {
   auto_reminder     Boolean
 
   subscriptions Subscriptions[]
+
+  Transaction Transaction[]
 }
 
 model Payment {
@@ -205,15 +207,32 @@ enum WalletType {
 }
 
 model Transaction {
-  id             String    @id @default(uuid())
-  order_id       String    @unique
+  id             String          @id @default(uuid())
+  order_id       String          @unique
   company_id     String
-  gross_amount   Int
+  type           TransactionType
+  gross_amount   Int?
   net_amount     Int
-  fee            Int
-  payment_method String
-  status         String?
+  fee            Int?
+  payment_method String?
+  status         TransactionStatus @default(unpaid)
+  plan_id String?
   update_at      DateTime?
 
   company Companies @relation(fields: [company_id], references: [id])
+  plan SubscriptionPLan? @relation(fields: [plan_id], references: [id])
+}
+
+enum TransactionType {
+  invoice
+  subscription
+}
+
+enum TransactionStatus{
+  unpaid
+  pending
+  paid
+  cancelled
+  failed
+  expired
 }

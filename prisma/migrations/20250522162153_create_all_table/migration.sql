@@ -2,6 +2,7 @@
   Warnings:
 
   - You are about to alter the column `phone` on the `Companies` table. The data in that column could be lost. The data in that column will be cast from `Text` to `VarChar(15)`.
+  - You are about to alter the column `price` on the `SubscriptionPLan` table. The data in that column could be lost. The data in that column will be cast from `Decimal(65,30)` to `Integer`.
   - You are about to drop the column `company_id` on the `Subscriptions` table. All the data in the column will be lost.
   - A unique constraint covering the columns `[subscription_id]` on the table `Companies` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `subscription_id` to the `Companies` table without a default value. This is not possible if the table is not empty.
@@ -28,6 +29,12 @@ CREATE TYPE "InvoiceStatus" AS ENUM ('unpaid', 'paid', 'overdue');
 -- CreateEnum
 CREATE TYPE "WalletType" AS ENUM ('bank', 'ewallet');
 
+-- CreateEnum
+CREATE TYPE "TransactionType" AS ENUM ('invoice', 'subscription');
+
+-- CreateEnum
+CREATE TYPE "TransactionStatus" AS ENUM ('unpaid', 'pending', 'paid', 'cancelled', 'failed', 'expired');
+
 -- DropForeignKey
 ALTER TABLE "Subscriptions" DROP CONSTRAINT "Subscriptions_company_id_fkey";
 
@@ -45,6 +52,9 @@ ALTER TABLE "Payment" ADD COLUMN     "account_name" TEXT NOT NULL,
 ADD COLUMN     "account_number" TEXT NOT NULL,
 ADD COLUMN     "is_default" BOOLEAN NOT NULL,
 ADD COLUMN     "wallet_id" TEXT NOT NULL;
+
+-- AlterTable
+ALTER TABLE "SubscriptionPLan" ALTER COLUMN "price" SET DATA TYPE INTEGER;
 
 -- AlterTable
 ALTER TABLE "Subscriptions" DROP COLUMN "company_id",
@@ -152,11 +162,13 @@ CREATE TABLE "Transaction" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "company_id" TEXT NOT NULL,
-    "gross_amount" INTEGER NOT NULL,
+    "type" "TransactionType" NOT NULL,
+    "gross_amount" INTEGER,
     "net_amount" INTEGER NOT NULL,
-    "fee" INTEGER NOT NULL,
-    "payment_method" TEXT NOT NULL,
-    "status" TEXT,
+    "fee" INTEGER,
+    "payment_method" TEXT,
+    "status" "TransactionStatus" NOT NULL DEFAULT 'unpaid',
+    "plan_id" TEXT,
     "update_at" TIMESTAMP(3),
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
@@ -212,3 +224,6 @@ ALTER TABLE "Invoices" ADD CONSTRAINT "Invoices_template_id_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_plan_id_fkey" FOREIGN KEY ("plan_id") REFERENCES "SubscriptionPLan"("id") ON DELETE SET NULL ON UPDATE CASCADE;
