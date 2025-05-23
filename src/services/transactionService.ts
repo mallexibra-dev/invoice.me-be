@@ -133,7 +133,7 @@ export const chargeTransactionService = async (
   }
 };
 
-export const cancelSendInvoice = async (orderId: string): Promise<ServiceResponse> => {
+export const cancelSendInvoiceService = async (orderId: string): Promise<ServiceResponse> => {
   try {
     const invoice = await prisma.invoices.findFirst({where: {id: orderId}});
     if(!invoice) return {error: true, status: 404, message: "Invoice not found"};

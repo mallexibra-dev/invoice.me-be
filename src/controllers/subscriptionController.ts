@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import logger from "../config/logging";
 import { errorResponse, successResponse } from "../utils/response";
-import { changeSubscriptionService } from "../services/subscriptionService";
+import { cancelChangeSubscriptionService, cancelTransactionChangeSubscriptionService, changeSubscriptionService, createChargeSubscriptionService } from "../services/subscriptionService";
 
 export const changeSubscriptionController = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
@@ -22,8 +22,15 @@ export const changeSubscriptionController = async (req: Request, res: Response) 
 }
 
 export const createChargeSubscriptionController = async (req: Request, res: Response) => {
+    const {order_id, company_id, payment_type, transaction_details, amount} = req.body;
     try{
+        if(!order_id || !company_id || !payment_type || !transaction_details || !amount) return errorResponse(res, 403, "Invalid body content");
 
+        const result = await createChargeSubscriptionService(order_id, company_id, payment_type, transaction_details, amount);
+
+        if(result.error) return errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Create charge subscription successfully", result.data);
     }catch(error: any){
         logger.error(error.message);
 
@@ -32,8 +39,15 @@ export const createChargeSubscriptionController = async (req: Request, res: Resp
 }
 
 export const cancelChangeSubscriptionController = async (req: Request, res: Response) => {
+    const {subscription_id} = req.params;
     try{
+        if(!subscription_id || subscription_id === "") return errorResponse(res, 403, "Invalid subscription id");
 
+        const result = await cancelChangeSubscriptionService(subscription_id);
+
+        if(result.error) errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Cancel change subscription successfully", result.data);
     }catch(error: any){
         logger.error(error.message);
 
@@ -42,8 +56,15 @@ export const cancelChangeSubscriptionController = async (req: Request, res: Resp
 }
 
 export const cancelTransactionChangeSubscriptionController = async (req: Request, res: Response) => {
+    const {subscription_id} = req.params;
     try{
+        if(!subscription_id || subscription_id === "") return errorResponse(res, 403, "Invalid subscription id");
 
+        const result = await cancelTransactionChangeSubscriptionService(subscription_id);
+
+        if(result.error) return errorResponse(res, result.status, result.message!);
+
+        return successResponse(res, 200, "Cancel transaction successfully", result.data);
     }catch(error: any){
         logger.error(error.message);
 
